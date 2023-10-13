@@ -22,6 +22,9 @@ RUN apt-get update && \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/\
     && docker-php-ext-install gd
 
+RUN apt-get update && apt-get install -y libpq-dev && apt-get install --only-upgrade libpq-dev -y
+RUN docker-php-ext-install pdo pgsql pdo_pgsql
+
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=debug,coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \

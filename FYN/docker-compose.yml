@@ -32,8 +32,6 @@ services:
 
   node:
     container_name: "${DB_NAME}_node"
-    #For mac users
-    #user: "node"
     build:
       context: ./app/frontend
     ports:
@@ -69,6 +67,8 @@ services:
         - POSTGRES_PASSWORD=${DB_USER_PASSWORD}
       ports:
         - "${POSTGRES_PORT}:5432"
+      volumes:
+        - ./app/data:/var/lib/postgresql/data
 
 
   phpmyadmin:

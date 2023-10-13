@@ -1,11 +1,12 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '15'
-
+        dbname: 'fyn'
+        host: '10.68.253.47'
+        port: '5433'
+        user: 'fynuser'
+        password: 'fidji'
+        driver: 'pdo_pgsql'
+        server_version: '16'
         profiling_collect_backtrace: '%kernel.debug%'
     orm:
         auto_generate_proxy_classes: true
