@@ -32,6 +32,8 @@ services:
 
   node:
     container_name: "${DB_NAME}_node"
+    #For mac users
+    #user: "node"
     build:
       context: ./app/frontend
     ports:

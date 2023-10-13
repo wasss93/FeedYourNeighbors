@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 
-class registerService{
+class RegisterService{
 
     private $doctrine;
 

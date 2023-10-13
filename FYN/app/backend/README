@@ -1,0 +1,3 @@
+//migartion 
+php bin/console make:migration
+
