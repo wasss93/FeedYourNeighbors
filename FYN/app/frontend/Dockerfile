@@ -17,7 +17,7 @@ COPY package*.json ./
 
 # Install project dependencies
 RUN yarn install
-RUN npm installa
+RUN npm install
 
 # Copy the rest of the application code to the container
 COPY . .
