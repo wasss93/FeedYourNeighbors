@@ -39,19 +39,19 @@ services:
       DB_USER: "${DB_USER_NAME}"
       DB_PASSWORD: ${DB_USER_PASSWORD}"
       DB_DATABASE: ${DB_NAME}"
-  nginx:
-    container_name: "${DB_NAME}_nginx"
-    image: nginx:stable-alpine
-    ports:
-      - "${HTTP_PORT}:80"
-    volumes:
-      - ./app/backend:/var/www/docker_sf
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - php
-      - pgsql
-    networks:
-      - my_network
+  # nginx:
+  #   container_name: "${DB_NAME}_nginx"
+  #   image: nginx:stable-alpine
+  #   ports:
+  #     - "${HTTP_PORT}:80"
+  #   volumes:
+  #     - ./app/backend:/var/www/docker_sf
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - php
+  #     - pgsql
+  #   networks:
+  #     - my_network
 
   pgsql:
       image: postgres:latest
@@ -68,34 +68,34 @@ services:
       networks:
       - my_network
 
-  phpmyadmin:
-    container_name: "${DB_NAME}_phpmyadmin"
-    image: phpmyadmin/phpmyadmin:latest
-    links:
-      - pgsql
-    depends_on:
-      - pgsql
-    ports:
-      - "${PHPMYADMIN_PORT}:80"
-    environment:
-      PMA_ARBITRARY: 1
-      PMA_HOST: pgsql
-      PMA_USER: ${DB_USER_NAME}
-      PMA_PASSWORD: ${DB_USER_PASSWORD}
-      UPLOAD_LIMIT: 20M
-    restart: always
-    networks:
-      - my_network
+  # phpmyadmin:
+  #   container_name: "${DB_NAME}_phpmyadmin"
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   links:
+  #     - pgsql
+  #   depends_on:
+  #     - pgsql
+  #   ports:
+  #     - "${PHPMYADMIN_PORT}:80"
+  #   environment:
+  #     PMA_ARBITRARY: 1
+  #     PMA_HOST: pgsql
+  #     PMA_USER: ${DB_USER_NAME}
+  #     PMA_PASSWORD: ${DB_USER_PASSWORD}
+  #     UPLOAD_LIMIT: 20M
+  #   restart: always
+  #   networks:
+  #     - my_network
 
-  maildev:
-    container_name: "${DB_NAME}_maildev"
-    image: maildev/maildev
-    command: ["bin/maildev", "--web", "80", "--smtp", "25", "--hide-extensions", "STARTTLS"]
-    ports:
-      - "${MAILDEV_PORT}:80"
-    restart: always
-    networks:
-      - my_network
+  # maildev:
+  #   container_name: "${DB_NAME}_maildev"
+  #   image: maildev/maildev
+  #   command: ["bin/maildev", "--web", "80", "--smtp", "25", "--hide-extensions", "STARTTLS"]
+  #   ports:
+  #     - "${MAILDEV_PORT}:80"
+  #   restart: always
+  #   networks:
+  #     - my_network
 
 volumes:
   db_data:
