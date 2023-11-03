@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Announcements;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -36,6 +37,23 @@ class AppFixtures extends Fixture
         $userAdmin->setRoles(["ROLE_ADMIN"]);
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
         $manager->persist($userAdmin);
+
+
+        //Création d'une annonce
+        $announcement = new Announcements();
+        $announcement->setOwner($user);
+        $announcement->setDescription("Description de l'annonce");
+        $announcement->setDate(new \DateTime());
+        $announcement->setLimitDate(new \DateTime());
+        $announcement->setTitle("Titre de l'annonce");
+        $announcement->setCategorie("Categorie de l'annonce");
+        $announcement->setDepartement("Departement de l'annonce");
+        $announcement->setNumeroRue("Numero de rue de l'annonce");
+        $announcement->setStatus(0);
+        $announcement->setRue("Rue de l'annonce");
+        $announcement->setCodePostal("Code postal de l'annonce");
+        $announcement->setVille("Ville de l'annonce");
+        $manager->persist($announcement);
 
         $manager->flush();
     }
