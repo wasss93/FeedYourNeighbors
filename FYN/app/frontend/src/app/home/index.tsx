@@ -5,7 +5,6 @@ import { Link } from 'expo-router';
 
 export default function homePage() {
 
-
     return (
         <View style={styles.container}>
             <Text style={styles.autre}>Home Page</Text>
