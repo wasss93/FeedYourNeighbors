@@ -1,16 +1,19 @@
-import { Button, Text, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from 'expo-router';
-
 import { Link } from 'expo-router';
 
-export default function homePage() {
+export default function index() {
 
 
     return (
         <View style={styles.container}>
-            <Text style={styles.autre}>Home Page</Text>
+            <Link href="/home" asChild>
+                <Pressable>
+                    <Text style={styles.autre}>Go to Home</Text>
+                </Pressable>
+            </Link>
         </View>
-    );
+    )
 }
 const styles = StyleSheet.create({
     container: {
@@ -19,7 +22,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     autre: {
-        backgroundColor: 'pink',
+        backgroundColor: 'green',
         textAlign: 'center',
+        fontSize: 22,
     }
 });
