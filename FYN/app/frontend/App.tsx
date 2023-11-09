@@ -4,9 +4,9 @@ import { store } from './src/app/store';
 import { App } from './src/';
 
 const MainApp = () => (
-  <Provider store={store}>
-    <App />
-  </Provider>
+    <Provider store={store}>
+        <App />
+    </Provider>
 );
 
 export default MainApp;
