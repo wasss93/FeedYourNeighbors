@@ -33,7 +33,17 @@ class MessageService
 
     public function getMessages(User $user1, User $user2)
     {
-        $messages = $this->entityManager->getRepository(Messages::class)->findMessages($user1, $user2);
+        $messages = $this->entityManager->getRepository(Messages::class)->findBy([
+            'sender' => $user1,
+            'recipient' => $user2,
+        ], [
+            'createdAt' => 'ASC',
+        ]);
+    
+        if (empty($messages)) {
+            throw new MessageException('Aucun message trouvé.');
+        }
+    
         return $messages;
     }
 

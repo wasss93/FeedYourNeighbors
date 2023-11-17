@@ -171,5 +171,34 @@ class ChatService implements MessageComponentInterface
 
         return null;
     }
+
+    
+    public function getMessagesChat($fromUserId, $to)
+    {
+        $sender = $this->getUserByUserId($fromUserId);
+        $recipient = $this->getUserByUserId($to);
+        if ($sender === null || $recipient === null) {
+            throw new MessageException('Utilisateur inconnu.');
+        }
+        if($sender->getId() === $recipient->getId()){
+            throw new MessageException('Vous ne pouvez pas vous envoyer un message à vous même.');
+        }
+        $messages = $this->messageService->getMessages($sender, $recipient);
+    
+        $toConnection = $this->getUserConnectionByUserId($to);
+        $fromConnection = $this->getUserConnectionByUserId($fromUserId);
+        if ($fromConnection !== null && $toConnection !== null) {
+            $toConnection->send(json_encode([
+                'from' => $this->getConnectionId($fromConnection),
+                'messages' => $messages,
+            ]));
+        }
+        try {
+            return $messages;
+        } catch (\Exception $e) {
+            throw new MessageException($e->getMessage());
+        }
+    
+    }
 }
 

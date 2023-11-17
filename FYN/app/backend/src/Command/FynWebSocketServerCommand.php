@@ -10,9 +10,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Service\ChatService;
 
-class WebSocketServerCommand extends Command
+class FynWebSocketServerCommand extends Command
 {
-    protected static $defaultName = 'app:websocket-server';
+    protected static $defaultName = 'app:fyn-websocket-server';
+
+    private $chatService;
+
+    public function __construct(ChatService $chatService)
+    {
+        parent::__construct();
+
+        $this->chatService = $chatService;
+    }
 
     protected function configure()
     {
@@ -21,10 +30,9 @@ class WebSocketServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $chatService = new ChatService();
         $server = IoServer::factory(
             new HttpServer(
-                new WsServer($chatService)
+                new WsServer($this->chatService)
             ),
             8080
         );
