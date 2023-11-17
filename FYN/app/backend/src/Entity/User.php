@@ -33,6 +33,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $username = null;
 
+    #[ORM\Column(length:255)]
+    private ?string $first_name = null;
+
+    #[ORM\Column(length:255)]
+    private ?string $last_name = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $birthDate = null;
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $departement = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $numero_rue = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $rue = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $code_postal = null;
+
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Announcements::class)]
     private Collection $announcements;
 
@@ -189,4 +212,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+    public function setFirstName(?string $first_name): static
+    {
+        $this->first_name = $first_name;
+        return $this;
+    }
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+
+    }
+    public function setLastName(?string $last_name): static
+    {
+        $this->last_name = $last_name;
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getDepartement(): ?string
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(string $departement): static
+    {
+        $this->departement = $departement;
+
+        return $this;
+    }
+
+    public function getNumeroRue(): ?string
+    {
+        return $this->numero_rue;
+    }
+
+    public function setNumeroRue(string $numero_rue): static
+    {
+        $this->numero_rue = $numero_rue;
+
+        return $this;
+    }
+
+    public function getRue(): ?string
+    {
+        return $this->rue;
+    }
+
+    public function setRue(string $rue): static
+    {
+        $this->rue = $rue;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->code_postal;
+    }
+
+    public function setCodePostal(string $code_postal): static
+    {
+        $this->code_postal = $code_postal;
+
+        return $this;
+    }
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $birthDate): static
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
+    }
+
 }
