@@ -28,6 +28,19 @@ class AppFixtures extends Fixture
         $user->setRoles(["ROLE_USER"]);
         $user->setUsername("user");
         $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
+        $currentDate = new \DateTime();
+        $user->setFirstName("first_name");
+        $user->setLastName("last_name");
+        $user->setBirthDate($currentDate);
+        $user->setVille("ville");
+        $user->setDepartement('departement');
+        $user->setNumeroRue('numero_rue');
+        $user->setRue('rue');
+        $user->setCodePostal('code_postal');
+        $user->setStatusUser(1);
+        $user->setNumeroTel('numero_tel');
+        $user->setIsVerified(1);
+        $user->setComplement('complement');
         $manager->persist($user);
 
         // Création d'un user admin
@@ -36,7 +49,21 @@ class AppFixtures extends Fixture
         $user->setUsername("admin");
         $userAdmin->setRoles(["ROLE_ADMIN"]);
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
+        $currentDate = new \DateTime();
+        $user->setFirstName("first_name");
+        $user->setLastName("last_name");
+        $user->setBirthDate($currentDate);
+        $user->setVille("ville");
+        $user->setDepartement('departement');
+        $user->setNumeroRue('numero_rue');
+        $user->setRue('rue');
+        $user->setCodePostal('code_postal');
+        $user->setStatusUser(1);
+        $user->setNumeroTel('numero_tel');
+        $user->setIsVerified(1);
+        $user->setComplement('complement');
         $manager->persist($userAdmin);
+
 
 
         //Création d'une annonce

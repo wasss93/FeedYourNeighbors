@@ -47,9 +47,16 @@ class Announcements
     #[ORM\Column(length: 255)]
     private ?string $code_postal = null;
 
+    #[ORM\Column(length:255)]
+    private ?string $complement = null;
+
     #[ORM\ManyToOne(inversedBy: 'announcements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
+
+    #[ORM\ManyToOne(inversedBy: 'announcements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $isAttributedTo = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $allergenes = null;
@@ -206,6 +213,17 @@ class Announcements
 
         return $this;
     }
+    public function getIsAttributedTo(): ?User
+    {
+        return $this->isAttributedTo;
+    }
+
+    public function setIsAttributedTo(?User $isAttributedTo): static
+    {
+        $this->isAttributedTo = $isAttributedTo;
+
+        return $this;
+    }
 
     public function isAllergenes(): ?bool
     {
@@ -228,6 +246,15 @@ class Announcements
     {
         $this->poids = $poids;
 
+        return $this;
+    }
+    public function getComplement(): ?string
+    {
+        return $this->complement;
+    }
+    public function setComplement(?string $complement): static
+    {
+        $this->complement = $complement;
         return $this;
     }
 }

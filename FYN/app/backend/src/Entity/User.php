@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -33,6 +34,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $username = null;
 
+
+    // 0 for a reciever, 1 for donator
+    #[ORM\Column]
+    private ?bool $statusUser = null;
+
+
+    #[ORM\Column(length:255)]
+    private ?string $complement = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $code_postal = null;
+
     #[ORM\Column(length:255)]
     private ?string $first_name = null;
 
@@ -50,11 +63,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $numero_rue = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $rue = null;
+    #[ORM\Column(length:255)]
+    private ?string $numero_tel = null;
+
+    #[ORM\Column]
+    private ?bool $isVerified = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $code_postal = null;
+    private ?string $rue = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Announcements::class)]
     private Collection $announcements;
@@ -292,16 +308,58 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getBirthDate(): ?\DateTimeInterface
     {
         return $this->birthDate;
     }
 
-    public function setCreatedAt(\DateTimeInterface $birthDate): static
+    public function setBirthDate(\DateTimeInterface $birthDate): static
     {
         $this->birthDate = $birthDate;
 
         return $this;
     }
+
+    public function isStatusUser(): ?bool
+    {
+        return $this->statusUser;
+    }
+
+    public function setStatusUser(bool $statusUser): static
+    {
+        $this->statusUser = $statusUser;
+
+        return $this;
+    }
+    public function getNumeroTel(): ?string
+    {
+        return $this->numero_tel;
+    }
+    public function setNumeroTel(string $numero_tel): static
+    {
+        $this->numero_tel = $numero_tel;
+        return $this;
+    }
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+    
+    public function getComplement(): ?string
+    {
+        return $this->complement;
+    }
+    public function setComplement(?string $complement): static
+    {
+        $this->complement = $complement;
+        return $this;
+    }
+
+    
 
 }

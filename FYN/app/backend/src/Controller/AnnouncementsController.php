@@ -49,6 +49,8 @@ class AnnouncementsController extends AbstractController
             $announcementData = [
                 'id' => $announcement->getId(),
                 'owner_id' => $announcement->getOwner()->getId(),
+                'is_attributed_to_id'=> $announcement->getIsAttributedTo()->getId(),
+                'complement'=> $announcement->getComplement(),
                 'description' => $announcement->getDescription(),
                 'title' => $announcement->getTitle(),
                 'categorie' => $announcement->getCategorie(),
@@ -136,6 +138,8 @@ class AnnouncementsController extends AbstractController
                 $announcementData[] = [
                     'id' => $announcement->getId(),
                     'owner_id' => $announcement->getOwner()->getId(),
+                    'is_attributed_to_id'=> $announcement->getIsAttributedTo()->getId(),
+                    'complement'=> $announcement->getComplement(),
                     'description' => $announcement->getDescription(),
                     'title' => $announcement->getTitle(),
                     'categorie' => $announcement->getCategorie(),
