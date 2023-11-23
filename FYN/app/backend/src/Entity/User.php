@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -32,6 +33,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $username = null;
+
+
+    // 0 for a reciever, 1 for donator
+    #[ORM\Column]
+    private ?bool $statusUser = null;
+
+
+    #[ORM\Column(length:255)]
+    private ?string $complement = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $code_postal = null;
+
+    #[ORM\Column(length:255)]
+    private ?string $first_name = null;
+
+    #[ORM\Column(length:255)]
+    private ?string $last_name = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $birthDate = null;
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $departement = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $numero_rue = null;
+
+    #[ORM\Column(length:255)]
+    private ?string $numero_tel = null;
+
+    #[ORM\Column]
+    private ?bool $isVerified = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $rue = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Announcements::class)]
     private Collection $announcements;
@@ -189,4 +228,138 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+    public function setFirstName(?string $first_name): static
+    {
+        $this->first_name = $first_name;
+        return $this;
+    }
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+
+    }
+    public function setLastName(?string $last_name): static
+    {
+        $this->last_name = $last_name;
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getDepartement(): ?string
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(string $departement): static
+    {
+        $this->departement = $departement;
+
+        return $this;
+    }
+
+    public function getNumeroRue(): ?string
+    {
+        return $this->numero_rue;
+    }
+
+    public function setNumeroRue(string $numero_rue): static
+    {
+        $this->numero_rue = $numero_rue;
+
+        return $this;
+    }
+
+    public function getRue(): ?string
+    {
+        return $this->rue;
+    }
+
+    public function setRue(string $rue): static
+    {
+        $this->rue = $rue;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->code_postal;
+    }
+
+    public function setCodePostal(string $code_postal): static
+    {
+        $this->code_postal = $code_postal;
+
+        return $this;
+    }
+    public function getBirthDate(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(\DateTimeInterface $birthDate): static
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
+    }
+
+    public function isStatusUser(): ?bool
+    {
+        return $this->statusUser;
+    }
+
+    public function setStatusUser(bool $statusUser): static
+    {
+        $this->statusUser = $statusUser;
+
+        return $this;
+    }
+    public function getNumeroTel(): ?string
+    {
+        return $this->numero_tel;
+    }
+    public function setNumeroTel(string $numero_tel): static
+    {
+        $this->numero_tel = $numero_tel;
+        return $this;
+    }
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+    
+    public function getComplement(): ?string
+    {
+        return $this->complement;
+    }
+    public function setComplement(?string $complement): static
+    {
+        $this->complement = $complement;
+        return $this;
+    }
+
+    
+
 }

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\User;
+use DateTime;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 
 class RegisterService{
@@ -26,12 +27,27 @@ class RegisterService{
         // Créez un nouvel utilisateur
         $user = new User();
         $user->setEmail($data['email']);
-        $user->setUsername($data['username']);
         $user->setRoles(['ROLE_USER']);
+        $user->setUsername($data['username']);
+    
 
         // Utilisez bcrypt pour hacher le mot de passe
         $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
         $user->setPassword($hashedPassword);
+        $user->setFirstName($data['first_name']);
+        $user->setLastName($data['last_name']);
+        $birthDateStr = $data['birth_date'];
+        $birthDate = DateTime::createFromFormat('d/m/Y', $birthDateStr);
+        $user->setBirthDate($birthDate);
+        $user->setVille($data['ville']);
+        $user->setDepartement($data['departement']);
+        $user->setNumeroRue($data['numero_rue']);
+        $user->setRue($data['rue']);
+        $user->setCodePostal($data['code_postal']);
+        $user->setStatusUser($data['status_user']);
+        $user->setNumeroTel($data['numero_tel']);
+        $user->setIsVerified($data['is_verified']);
+        $user->setComplement($data['complement']);
 
         // Enregistrez l'utilisateur dans la base de données
         $entityManager->persist($user);

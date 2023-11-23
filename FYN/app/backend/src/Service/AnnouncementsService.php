@@ -3,15 +3,10 @@
 namespace App\Service;
 
 use App\Entity\User;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Announcements;
 use DateTimeImmutable;
 use DateInterval;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 
 class AnnouncementsService
@@ -29,7 +24,10 @@ class AnnouncementsService
         $entityManager = $this->doctrine->getManager();
         $announcements = new Announcements();
         $user = $entityManager->find(User::class, $data['owner_id']);
+        $attributedToUser = $entityManager->find(User::class, $data['attributed_to_id']);
         $announcements->setOwner($user);
+        $announcements->setIsAttributedTo($attributedToUser);
+        $announcements->setComplement($data['complement']);
         $announcements->setDescription($data['description']);
         if (array_key_exists('date', $data)) {
             $announcements->setDate($data['date']);
@@ -75,7 +73,7 @@ class AnnouncementsService
 
     }
 
-    public function updateAnnouncementStatus(int $id)
+    public function bookAnnouncement(int $id)
     {
         $entityManager = $this->doctrine->getManager();
         $announcement = $entityManager->getRepository(Announcements::class)->find($id);
@@ -110,6 +108,16 @@ class AnnouncementsService
     {
         $manager = $this->doctrine->getManager();
         $announcements = $manager->getRepository(Announcements::class)->findBy(['owner' => $ownerId]);
+        if (!$announcements) {
+            return null;
+        }
+        return $announcements;
+    }
+
+    public function getBookedAnnouncements(int $attributedToId)
+    {
+        $manager = $this->doctrine->getManager();
+        $announcements = $manager->getRepository(Announcements::class)->findBy(['isAttributedTo' => $attributedToId]);
         if (!$announcements) {
             return null;
         }

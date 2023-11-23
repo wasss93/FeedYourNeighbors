@@ -49,6 +49,8 @@ class AnnouncementsController extends AbstractController
             $announcementData = [
                 'id' => $announcement->getId(),
                 'owner_id' => $announcement->getOwner()->getId(),
+                'is_attributed_to_id' => $announcement->getIsAttributedTo()->getId(),
+                'complement' => $announcement->getComplement(),
                 'description' => $announcement->getDescription(),
                 'title' => $announcement->getTitle(),
                 'categorie' => $announcement->getCategorie(),
@@ -72,8 +74,8 @@ class AnnouncementsController extends AbstractController
     }
 
 
-    #[Route('/api/announcement/updateAnnouncementStatus/{id}', name: 'announcement_status_update', methods: ['POST'])]
-    public function updateAnnouncementStatus(int $id, AnnouncementsService $announcementService, Request $request): JsonResponse
+    #[Route('/api/announcement/bookAnnouncement/{id}', name: 'announcement_status_update', methods: ['POST'])]
+    public function bookAnnouncement(int $id, AnnouncementsService $announcementService, Request $request): JsonResponse
     {
         try {
             $announcement = $announcementService->getAnnouncement($id);
@@ -81,7 +83,7 @@ class AnnouncementsController extends AbstractController
                 throw new AnnouncementNotFoundException($id);
             }
 
-            $result = $announcementService->updateAnnouncementStatus($id);
+            $result = $announcementService->bookAnnouncement($id);
 
             if ($result !== null) {
                 throw new AnnouncementServiceException('Erreur lors de la mise à jour du statut de l\'annonce');
@@ -117,6 +119,50 @@ class AnnouncementsController extends AbstractController
         }
     }
 
+    #[Route('/api/announcement/getBookedAnnouncements', name: 'get_booked_announcements', methods: ['POST'])]
+
+    public function getBookedAnnouncements(AnnouncementsService $announcementService, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $attributedToId = $data['attributed_to'];
+
+        try {
+            $announcements = $announcementService->getBookedAnnouncements($attributedToId);
+            if (empty($announcements)) {
+                throw new AnnouncementNotFoundException($attributedToId);
+            }
+            $announcementData = [];
+
+            foreach ($announcements as $announcement) {
+                $announcementData[] = [
+                    'id' => $announcement->getId(),
+                    'owner_id' => $announcement->getOwner()->getId(),
+                    'is_attributed_to_id' => $announcement->getIsAttributedTo()->getId(),
+                    'complement' => $announcement->getComplement(),
+                    'description' => $announcement->getDescription(),
+                    'title' => $announcement->getTitle(),
+                    'categorie' => $announcement->getCategorie(),
+                    'date' => $announcement->getDate()->format('Y-m-d H:i:s'),
+                    'limitDate' => $announcement->getLimitDate()->format('Y-m-d H:i:s'),
+                    'status' => $announcement->isStatus(),
+                    'departement' => $announcement->getDepartement(),
+                    'numero_rue' => $announcement->getNumeroRue(),
+                    'rue' => $announcement->getRue(),
+                    'ville' => $announcement->getVille(),
+                    'code_postal' => $announcement->getCodePostal(),
+                    'allergenes' => $announcement->isAllergenes(),
+                    'poids' => $announcement->getPoids(),
+                ];
+            }
+
+            return $this->json($announcementData[0], 200);
+        } catch (AnnouncementNotFoundException $exception) {
+            return $this->json(['error' => $exception->getMessage()], 404);
+        }
+
+    }
+
+
     #[Route('/api/announcement/getAnnouncementsOwner', name: 'get_announcement_by_owner', methods: ['POST'])]
     public function getAnnouncementOwner(announcementsService $announcementService, Request $request): JsonResponse
     {
@@ -136,6 +182,8 @@ class AnnouncementsController extends AbstractController
                 $announcementData[] = [
                     'id' => $announcement->getId(),
                     'owner_id' => $announcement->getOwner()->getId(),
+                    'is_attributed_to_id' => $announcement->getIsAttributedTo()->getId(),
+                    'complement' => $announcement->getComplement(),
                     'description' => $announcement->getDescription(),
                     'title' => $announcement->getTitle(),
                     'categorie' => $announcement->getCategorie(),

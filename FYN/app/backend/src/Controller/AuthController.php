@@ -22,9 +22,11 @@ class AuthController extends AbstractController
     {
         // Récupérez les données JSON de la requête
         $data = json_decode($request->getContent(), true);
-
-        // Appel au service pour créer un utilisateur
-        $result = $registrationService->createUser($data);
+        try {
+            $result = $registrationService->createUser($data);
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
         if ($result !== null) {
             return new JsonResponse($result, 500); // Erreur
