@@ -6,7 +6,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/connect/_layout.js"  ],
   "exclude": [
     "node_modules"
   ]

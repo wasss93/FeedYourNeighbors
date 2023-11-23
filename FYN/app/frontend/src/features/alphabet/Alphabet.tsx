@@ -10,7 +10,7 @@ const AlphabetComponent = () => {
 
     // Utilisez useState pour gérer la lettre saisie par l'utilisateur.
     const [selectedLetter, setSelectedLetter] = useState('');
-
+    
     const handleUpdateAlphabet = () => {
         // Dispatchez l'action setLetters avec la nouvelle valeur pour mettre à jour 'alphabet' dans le store.
         dispatch(setLetters(selectedLetter));
