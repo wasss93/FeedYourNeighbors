@@ -73,7 +73,7 @@ class AnnouncementsService
 
     }
 
-    public function updateAnnouncementStatus(int $id)
+    public function bookAnnouncement(int $id)
     {
         $entityManager = $this->doctrine->getManager();
         $announcement = $entityManager->getRepository(Announcements::class)->find($id);
@@ -108,6 +108,16 @@ class AnnouncementsService
     {
         $manager = $this->doctrine->getManager();
         $announcements = $manager->getRepository(Announcements::class)->findBy(['owner' => $ownerId]);
+        if (!$announcements) {
+            return null;
+        }
+        return $announcements;
+    }
+
+    public function getBookedAnnouncements(int $attributedToId)
+    {
+        $manager = $this->doctrine->getManager();
+        $announcements = $manager->getRepository(Announcements::class)->findBy(['isAttributedTo' => $attributedToId]);
         if (!$announcements) {
             return null;
         }
