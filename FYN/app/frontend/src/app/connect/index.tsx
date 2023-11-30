@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   
-  const apiURL = 'https://localhost:9000/api/login';
+  const apiURL = ' https://14bb-163-5-23-68.ngrok-free.app/api/login';
 
   const login = async () => {
     const params = {
@@ -19,7 +19,7 @@ export default function LoginPage() {
     };
   
     try {
-      const response = await axios.post(apiURL, params);
+      const response = await axios.post(apiURL, params).then();
       console.log('Response data:', response.data);
     } catch (error) {
       // console.error('Error making the request:', error);

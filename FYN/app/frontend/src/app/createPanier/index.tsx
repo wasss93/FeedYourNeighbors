@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, TouchableHighlight, TouchableWithoutFeedback  } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 
 interface TimeSlotOption {
@@ -10,6 +10,7 @@ interface TimeSlotOption {
 interface FoodOption {
   label: string;
   value: string;
+  ean: string;
 }
 
 const formatDate = (date: Date) => {
@@ -34,8 +35,31 @@ export default function CreatePanierPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [placeholderText, setPlaceholderText] = useState("Choisissez une date");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
-  const [selectedSlotsList, setSelectedSlotsList] = useState<{ day: string; slot: string }[]>([]);
+  const [selectedSlotsList, setSelectedSlotsList] = useState<{ day: string; slot: { dateDebut: string; dateEnd: string } }[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedFoodInfo, setSelectedFoodInfo] = useState<{ food: string; quantity: number; ean: string } | null>(null);
+  const [nutritionInfo, setNutritionInfo] = useState<any>(null); // Utilisez un type plus précis pour les informations nutritionnelles
 
+  const showFoodModal = async (foodInfo: { food: string; quantity: number; ean: string }) => {
+    setSelectedFoodInfo(foodInfo);
+    var api_key = "0ad5af6f3a7a484a95519fa67a64c39f";
+    try {
+      const response = await fetch(`https://api.spoonacular.com/food/products/upc/${foodInfo.ean}?apiKey=${api_key}&includeNutrition=true`);
+      const data = await response.json();
+      console.log("Informations nutritionnelles :", data);
+      setNutritionInfo(data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des informations nutritionnelles :", error);
+      setNutritionInfo(null);
+    }
+  
+    setModalVisible(true);
+  };
+
+  const hideFoodModal = () => {
+    setSelectedFoodInfo(null);
+    setModalVisible(false);
+  };
 
   const handleContinue = () => {
     const formData = {
@@ -64,20 +88,20 @@ export default function CreatePanierPage() {
   ];
 
   const foodOptions: FoodOption[] = [
- { label: "Lactel 1L", value: "Lactel 1L" },
-    { label: "Paquet de pates Panzani", value: "Paquet de pates Panzani" },
-    { label: "Paquet de riz Basmati", value: "Paquet de riz Basmati" },
-    { label: "Snickers pack", value: "Snickers pack" },
-    { label: "Jus d'orange 1L", value: "Jus d'orange 1L" },
-    { label: "Pommes (1kg)", value: "Pommes (1kg)" },
-    { label: "Poulet entier", value: "Poulet entier" },
-    { label: "Yaourt nature", value: "Yaourt nature" },
-    { label: "Pain de mie", value: "Pain de mie" },
-    { label: "Salade verte", value: "Salade verte" },
-    { label: "Céréales petit-déjeuner", value: "Céréales petit-déjeuner" },
-    { label: "Poisson en conserve", value: "Poisson en conserve" }  ];
+    { label: "Lactel 1L", value: "Lactel 1L", ean: "3428272000059" },
+    { label: "Paquet de pates Panzani", value: "Paquet de pates Panzani", ean: "3038350013606" },
+    { label: "Paquet de riz Basmati", value: "Paquet de riz Basmati", ean: "3038359010408" },
+    { label: "Snickers pack", value: "Snickers pack", ean: "5000159452540" },
+    { label: "Jus d'orange 1L", value: "Jus d'orange 1L", ean: "3168930156376" },
+    { label: "Pommes (1kg)", value: "Pommes (1kg)", ean: "3276550063636" },
+    { label: "Poulet entier", value: "Poulet entier", ean: "3560070739394" },
+    { label: "Yaourt nature", value: "Yaourt nature", ean: "3596710047826" },
+    { label: "Pain de mie", value: "Pain de mie", ean: "3270190021438" },
+    { label: "Salade verte", value: "Salade verte", ean: "3280223110077" },
+    { label: "Céréales petit-déjeuner", value: "Céréales petit-déjeuner", ean: "7613034947611" },
+    { label: "Poisson en conserve", value: "Poisson en conserve", ean: "3560070808731" }  ];
 
-  const handleAddToPanier = (food: string, quantity: number) => {
+  const handleAddToPanier = (food: string, quantity: number, ean: string) => {
     if (food !== "" && !selectedFoodsList.some((item) => item.food === food)) {
       setSelectedFoodsList([{ food, quantity }, ...selectedFoodsList]);
     }
@@ -85,12 +109,48 @@ export default function CreatePanierPage() {
 
   const handleAddToSlotsList = () => {
     if (selectedDate && selectedTimeSlot) {
-      const formattedDate = formatDate(new Date(selectedDate));
-      const slotInfo = `${formattedDate} ${selectedTimeSlot}`;
-      setSelectedSlotsList([{ day: formattedDate, slot: slotInfo }, ...selectedSlotsList]);
-      setSelectedDate(null); // Réinitialiser la date à null
-      setSelectedTimeSlot(null); // Réinitialiser l'heure à null
-      setPlaceholderText("Choisissez une date"); // Réinitialiser le texte du placeholder
+      const formattedDate = new Date(selectedDate);
+      const slotStart = new Date(formattedDate);
+      const slotEnd = new Date(formattedDate);
+
+      // Set the start time based on the selected time slot
+      switch (selectedTimeSlot) {
+        case 'Matin tôt (8h-10h)':
+          slotStart.setHours(8, 0, 0, 0);
+          slotEnd.setHours(10, 0, 0, 0);
+          break;
+        case 'Mi-matinée (10h-12h)':
+          slotStart.setHours(10, 0, 0, 0);
+          slotEnd.setHours(12, 0, 0, 0);
+          break;
+        case 'Début d\'après-midi (14h-16h)':
+          slotStart.setHours(14, 0, 0, 0);
+          slotEnd.setHours(16, 0, 0, 0);
+          break;
+        case 'Fin d\'après-midi (16h-18h)':
+          slotStart.setHours(16, 0, 0, 0);
+          slotEnd.setHours(18, 0, 0, 0);
+          break;
+        case 'Soirée (18h-20h)':
+          slotStart.setHours(18, 0, 0, 0);
+          slotEnd.setHours(20, 0, 0, 0);
+          break;
+        default:
+          // Handle other cases if needed
+      }
+
+      const slotInfo = {
+        day: formattedDate.toLocaleDateString('fr-FR'),
+        slot: {
+          dateDebut: slotStart.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric' }),
+          dateEnd: slotEnd.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric' }),
+        },
+      };
+
+      setSelectedSlotsList([slotInfo, ...selectedSlotsList]);
+      setSelectedDate(null);
+      setSelectedTimeSlot(null);
+      setPlaceholderText("Choisissez une date");
     }
   };
 
@@ -135,7 +195,7 @@ export default function CreatePanierPage() {
 
             <TouchableOpacity
               style={styles.createButton}
-              onPress={() => handleAddToPanier(selectedFood as string, selectedQuantity)}
+              onPress={() => handleAddToPanier(selectedFood as string, selectedQuantity, foodOptions.find((item) => item.value === selectedFood)?.ean as string)}
             >
               <Text style={styles.buttonText}>Ajouter au panier</Text>
             </TouchableOpacity>
@@ -143,18 +203,56 @@ export default function CreatePanierPage() {
             {selectedFoodsList.length > 0 && (
               <View style={styles.selectedFoodsContainer}>
                 <Text style={styles.label}>Aliments sélectionnés :</Text>
-                  {selectedFoodsList.map((item, index) => (
-                    <View key={index} style={styles.selectedFoodItem}>
-                      <Text style={styles.selectedFoodText}>
-                        {item.food} - Quantité: {item.quantity}
-                      </Text>
-                    </View>
-                  ))}
+                {selectedFoodsList.map((item, index) => (
+            <TouchableWithoutFeedback
+              key={index}
+              onPress={() => showFoodModal({ food: item.food, quantity: item.quantity, ean: foodOptions.find((option) => option.value === item.food)?.ean as string })}
+              style={styles.touchableFoodItem}
+            >
+              <View style={styles.selectedFoodItem}>
+                <Text style={styles.selectedFoodText}>
+                  {item.food} - Quantité: {item.quantity}
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          ))}
               </View>
             )}
-            <Text style={styles.additionalText}>
-              This is additional text below the form and the selected foods list.
-            </Text>
+<Modal
+  animationType="slide"
+  transparent={false}
+  visible={modalVisible}
+  onRequestClose={hideFoodModal}
+>
+  <View style={styles.modalContainer}>
+    <Text style={styles.modalText}>
+      Selected Food: {nutritionInfo?.title}
+    </Text>
+    <Text style={styles.modalText}>
+      Quantity: {selectedFoodInfo?.quantity}
+    </Text>
+    <Text style={styles.modalText}>
+      EAN: {selectedFoodInfo?.ean}
+    </Text>
+    {nutritionInfo && nutritionInfo.nutrition && nutritionInfo.nutrition.nutrients && (
+      <>
+        <Text style={styles.modalText}>Nutrition Information:</Text>
+        {nutritionInfo.nutrition.nutrients.map((nutrient: any, index: number) => (
+          <Text key={index} style={styles.modalText}>
+            {nutrient.name}: {nutrient.amount} {nutrient.unit}
+          </Text>
+        ))}
+      </>
+    )}
+    {/* <Text style={styles.modalText}>
+      JSON Information:
+      {JSON.stringify(nutritionInfo, null, 2)}
+    </Text> */}
+    <TouchableWithoutFeedback onPress={hideFoodModal}>
+      <Text style={styles.modalCloseText}>Close</Text>
+    </TouchableWithoutFeedback>
+  </View>
+</Modal>
 
             <View style={styles.dropdownContainer}>
               <Text style={styles.label}>Date de livraison :</Text>
@@ -173,7 +271,7 @@ export default function CreatePanierPage() {
                 placeholder={{
                   label: placeholderText,
                   value: null,
-                  disabled: true, // Rend le placeholder non sélectionnable
+                  disabled: true,
                 }}
                 items={dateOptions}
                 onValueChange={(value) => {
@@ -187,32 +285,47 @@ export default function CreatePanierPage() {
             <View style={styles.dropdownContainer}>
               <Text style={styles.label}>Créneau de livraison :</Text>
               <RNPickerSelect
-              style={pickerSelectStyles}
-              placeholder={{ label: "Sélectionnez le créneau", value: null }}
-              items={timeSlotOptions}
-              onValueChange={(value) => setSelectedTimeSlot(value)}
-              value={selectedTimeSlot}
+                style={pickerSelectStyles}
+                placeholder={{ label: "Sélectionnez le créneau", value: null }}
+                items={[
+                  { label: "Matin tôt (8h-10h)", value: "Matin tôt (8h-10h)" },
+                  { label: "Mi-matinée (10h-12h)", value: "Mi-matinée (10h-12h)" },
+                  { label: "Début d'après-midi (14h-16h)", value: "Début d'après-midi (14h-16h)" },
+                  { label: "Fin d'après-midi (16h-18h)", value: "Fin d'après-midi (16h-18h)" },
+                  { label: "Soirée (18h-20h)", value: "Soirée (18h-20h)" },
+                ]}
+                onValueChange={(value) => setSelectedTimeSlot(value)}
+                value={selectedTimeSlot}
               />
             </View>
             <TouchableOpacity
               style={styles.createButton}
               onPress={() => handleAddToSlotsList()}
             >
-            <Text style={styles.buttonText}>Ajouter un créneau</Text>
+              <Text style={styles.buttonText}>Ajouter un créneau</Text>
             </TouchableOpacity>
             {selectedSlotsList.length > 0 && (
-            <View style={styles.selectedFoodsContainer}>
-              <Text style={styles.label}>Créneaux sélectionnés :</Text>
-              {selectedSlotsList.map((item, index) => (
-                <View key={index} style={styles.selectedFoodItem}>
-                  <Text style={styles.selectedFoodText}>{item.slot}</Text>
+              <View style={styles.selectedFoodsContainer}>
+                <Text style={styles.label}>Créneaux sélectionnés :</Text>
+                {selectedSlotsList.map((item, index) => (
+                  <View key={index} style={styles.selectedFoodItem}>
+                  <Text style={styles.selectedFoodText}>
+                    {item.day} - De {item.slot.dateDebut} à {item.slot.dateEnd}
+                  </Text>
                 </View>
-              ))}
-            </View>
-          )}
+                
+                ))}
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={() => handleContinue()}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
           </View>
         </View>
-      </View>
     </ScrollView>
   );
 }
@@ -290,6 +403,7 @@ const styles = StyleSheet.create({
   },
   selectedFoodsContainer: {
     marginTop: 20,
+    marginBottom: 20, // Add margin bottom for spacing
   },
   selectedFoodItem: {
     backgroundColor: "white",
@@ -310,9 +424,42 @@ const styles = StyleSheet.create({
     borderColor: "white",
     marginBottom: 20,
   },
+ submitButton: {
+    backgroundColor: "#15A370",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "white",
+  },
   buttonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#15A370',
+    padding: 20,
+  },
+  modalText: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 10,
+  },
+  modalCloseText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+   touchableFoodItem: {
+    opacity: 3, 
+  },
+  touchableCloseButton: {
+    opacity: 0.7,
   },
 });
