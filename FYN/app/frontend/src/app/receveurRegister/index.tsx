@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, TextInput } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 interface CustomTextInputProps {
   value: string;

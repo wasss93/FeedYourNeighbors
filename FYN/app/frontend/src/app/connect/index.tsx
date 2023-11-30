@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView} from "react-native";
 import { Link, useNavigation } from 'expo-router';
+import axios from "axios";
 
 export default function LoginPage() {
   const navigation = useNavigation();
@@ -8,13 +9,30 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  
+  const apiURL = 'https://localhost:9000/api/login';
+
+  const login = async () => {
+    const params = {
+      email: "user3@gmail.com",
+      password: "azer123",
+    };
+  
+    try {
+      const response = await axios.post(apiURL, params);
+      console.log('Response data:', response.data);
+    } catch (error) {
+      // console.error('Error making the request:', error);
+      console.log('Error details:', error);
+    }
+  };
 
   const handleLogin = () => {
     // Clear previous error messages
     setEmailError('');
     setPasswordError('');
 
-    // Validate email format
+    // Validate email format(())
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setEmailError('Email format is not valid');
@@ -26,12 +44,11 @@ export default function LoginPage() {
       setPasswordError('Password must be at least 8 characters long');
       return; // Do not proceed with login
     }
-
-    // If email and password are valid, proceed with login logic
+    
     console.log('Email:', email);
     console.log('Password:', password);
-    // Add your login logic here
     console.log('Login button pressed');
+    login();
   };
 
   return (
@@ -71,7 +88,7 @@ export default function LoginPage() {
           <Link href="/home" style={[styles.linkToHome]} asChild>
             <TouchableOpacity
               style={styles.connectButton}
-              onPress={handleLogin}
+              onPress={login}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
@@ -89,7 +106,7 @@ export default function LoginPage() {
       </View>
     </View>
   );
-}
+  }
 
 const styles = StyleSheet.create({
   container: {
