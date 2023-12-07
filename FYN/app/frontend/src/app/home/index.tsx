@@ -10,16 +10,25 @@ export default function ShoppingCartPage() {
         <Text style={styles.subtitle}>Interface donnateur</Text>
 
         <View style={styles.formContainer}>
+          <Link href="/createPanier" asChild>
+            <TouchableOpacity
+              style={styles.addButton}
+              // onPress={() => console.log('Ajouter au panier button pressed')}
+            >
+              <Text style={styles.buttonText}>+ Créer un panier</Text>
+            </TouchableOpacity>
+          </Link>
 
+          {/* Bouton "Réserver un panier" */}
+          <Link href="/bookPanier" asChild>
 
-            <Link href="/createPanier" asChild>
           <TouchableOpacity
-            style={styles.addButton}
-            // onPress={() => console.log('Ajouter au panier button pressed')}
+            style={styles.reserveButton}
+            // onPress={() => console.log('Réserver un panier button pressed')}
           >
-            <Text style={styles.buttonText}>+ Créer un panier</Text>
+            <Text style={styles.buttonText}>+ Réserver un panier </Text>
           </TouchableOpacity>
-            </Link>
+          </Link>
         </View>
       </View>
     </View>
@@ -56,7 +65,17 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: "#15A370",
     paddingVertical: 15,
-    paddingHorizontal: 20, // Add padding horizontally
+    paddingHorizontal: 20,
+    alignItems: "center",
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "white",
+    marginTop: 20,
+  },
+  reserveButton: {
+    backgroundColor: "#15A370", // Couleur à adapter si nécessaire
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     alignItems: "center",
     borderRadius: 8,
     borderWidth: 2,

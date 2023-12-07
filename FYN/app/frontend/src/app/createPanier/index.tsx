@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, TouchableHighlight, TouchableWithoutFeedback  } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
+import codegenNativeCommands from "react-native/Libraries/Utilities/codegenNativeCommands";
+import axios from "axios";
 
 interface TimeSlotOption {
   label: string;
@@ -30,7 +32,7 @@ const dateOptions = Array.from({ length: 7 }, (_, i) => {
 export default function CreatePanierPage() {
   const [selectedFood, setSelectedFood] = useState<string | null>(null);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-  const [selectedFoodsList, setSelectedFoodsList] = useState<{ food: string; quantity: number }[]>([]);
+  const [selectedFoodsList, setSelectedFoodsList] = useState<{ food: string; quantity: number, ean: string}[]>([]);
   const [tempSelectedDate, setTempSelectedDate] =  useState(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [placeholderText, setPlaceholderText] = useState("Choisissez une date");
@@ -46,7 +48,7 @@ export default function CreatePanierPage() {
     try {
       const response = await fetch(`https://api.spoonacular.com/food/products/upc/${foodInfo.ean}?apiKey=${api_key}&includeNutrition=true`);
       const data = await response.json();
-      console.log("Informations nutritionnelles :", data);
+      console.log("data", data);
       setNutritionInfo(data);
     } catch (error) {
       console.error("Erreur lors de la récupération des informations nutritionnelles :", error);
@@ -61,13 +63,46 @@ export default function CreatePanierPage() {
     setModalVisible(false);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const formData = {
       selectedFoodsList,
       selectedSlotsList,
       // Add other fields if needed
     };
+    const params = {
+      "complement":"complement 2",
+      "description":"Ceci est une test description",
+      "title":"ceci est un autre titre test",
+      "ville":"Test",
+      "numero_rue":"29 bis",
+      "categorie":"patates zakia",
+      "departement":"Sadam hautes saines a zakia",
+      "rue":"boulevard gallieni",
+      "code_postal":"93360",
+      "allergenes":true,
+      "status":0,
+      "poids":"18kg",
+      "contenu": [
+          {item: "item1", quantite: 10, codeEAN: "code1"},
+          {item: "item2", quantite: 5, codeEAN: "code2"}
+      ]
+    };
 
+    const apiURL = 'https://3ac0-163-5-23-68.ngrok-free.app/api/announcement/createAnnouncement';
+    try{
+      const header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MDEzNzA1MTMsImV4cCI6MTcwMTM3NDExMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidXNlckBnbWFpbC5jb20ifQ.UrbjopmFAqIANOnD9L1pX2KDUFWOzmh_3-IZP7YRprNf67TMnR_LRIZVsU3Ak5ihR81ZOtmqMzzmMGpGk13xA5ZKVTRJ1deMYNIIAXuXXIJE3GeOAd5QpuUhnkrteEatSL0Sf9eHePMVTHpGaXI6oSJg6SlOmCu3MM_AEAeYfGoY0DnyubkG-8AfVde53_zVHGZrtI5SK-urgMFtV8cQ1PgiSmPGJbcMCTv2pecN4AiWVef1Mz3MFkozFh5LPlQ2q0fKvTt5dacsrSjDgGVvpNZPNZw1jJDUMnspi0cqRwBTbFULsZm8LrKd6pyXbftZyYAywDUrnOSLS3E0NR3DKA'
+        }
+      }
+      const response = await axios.post(apiURL, params, header);
+      console.log(response.data, response.status);
+    }
+    catch(error){
+      console.error('err', error);
+    }
     const jsonData = JSON.stringify(formData);
     saveJSONFile(jsonData);
     // Add other actions you want to perform after saving the data
@@ -103,7 +138,7 @@ export default function CreatePanierPage() {
 
   const handleAddToPanier = (food: string, quantity: number, ean: string) => {
     if (food !== "" && !selectedFoodsList.some((item) => item.food === food)) {
-      setSelectedFoodsList([{ food, quantity }, ...selectedFoodsList]);
+      setSelectedFoodsList([{ food, quantity, ean }, ...selectedFoodsList]);
     }
   };
 
@@ -204,7 +239,7 @@ export default function CreatePanierPage() {
               <View style={styles.selectedFoodsContainer}>
                 <Text style={styles.label}>Aliments sélectionnés :</Text>
                 {selectedFoodsList.map((item, index) => (
-            <TouchableWithoutFeedback
+            <TouchableOpacity
               key={index}
               onPress={() => showFoodModal({ food: item.food, quantity: item.quantity, ean: foodOptions.find((option) => option.value === item.food)?.ean as string })}
               style={styles.touchableFoodItem}
@@ -214,7 +249,7 @@ export default function CreatePanierPage() {
                   {item.food} - Quantité: {item.quantity}
                 </Text>
               </View>
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           ))}
               </View>
             )}
@@ -248,9 +283,9 @@ export default function CreatePanierPage() {
       JSON Information:
       {JSON.stringify(nutritionInfo, null, 2)}
     </Text> */}
-    <TouchableWithoutFeedback onPress={hideFoodModal}>
+    <TouchableOpacity onPress={hideFoodModal}>
       <Text style={styles.modalCloseText}>Close</Text>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   </View>
 </Modal>
 

@@ -10,16 +10,16 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   
-  const apiURL = ' https://14bb-163-5-23-68.ngrok-free.app/api/login';
+  const apiURL = 'https://3ac0-163-5-23-68.ngrok-free.app/api/login';
 
-  const login = async () => {
+  const login = async (email:string, password:string) => {
     const params = {
-      email: "user3@gmail.com",
-      password: "azer123",
+      email: email,
+      password: password,
     };
   
     try {
-      const response = await axios.post(apiURL, params).then();
+      const response = await axios.post(apiURL, params);
       console.log('Response data:', response.data);
     } catch (error) {
       // console.error('Error making the request:', error);
@@ -29,26 +29,25 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     // Clear previous error messages
-    setEmailError('');
-    setPasswordError('');
+    // setEmailError('');
+    // setPasswordError('');
 
-    // Validate email format(())
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError('Email format is not valid');
-      return; // Do not proceed with login
-    }
+    // // Validate email format(())
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //   setEmailError('Email format is not valid');
+    //   return; // Do not proceed with login
+    // }
 
-    // Validate password length
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      return; // Do not proceed with login
-    }
-    
+    // // Validate password length
+    // if (password.length < 8) {
+    //   setPasswordError('Password must be at least 8 characters long');
+    //   return; // Do not proceed with login
+    // }
     console.log('Email:', email);
     console.log('Password:', password);
     console.log('Login button pressed');
-    login();
+    login(email, password);
   };
 
   return (
@@ -88,7 +87,7 @@ export default function LoginPage() {
           <Link href="/home" style={[styles.linkToHome]} asChild>
             <TouchableOpacity
               style={styles.connectButton}
-              onPress={login}
+              onPress={handleLogin}
             >
               <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
