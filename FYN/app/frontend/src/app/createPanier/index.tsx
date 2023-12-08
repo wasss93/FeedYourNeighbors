@@ -32,7 +32,7 @@ const dateOptions = Array.from({ length: 7 }, (_, i) => {
 export default function CreatePanierPage() {
   const [selectedFood, setSelectedFood] = useState<string | null>(null);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-  const [selectedFoodsList, setSelectedFoodsList] = useState<{ food: string; quantity: number, ean: string}[]>([]);
+  const [selectedFoodsList, setSelectedFoodsList] = useState<{ item: string; quantite: number, codeEAN: string}[]>([]);
   const [tempSelectedDate, setTempSelectedDate] =  useState(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [placeholderText, setPlaceholderText] = useState("Choisissez une date");
@@ -64,6 +64,7 @@ export default function CreatePanierPage() {
   };
 
   const handleContinue = async () => {
+    console.log("jjjjjjj");
     const formData = {
       selectedFoodsList,
       selectedSlotsList,
@@ -73,28 +74,25 @@ export default function CreatePanierPage() {
       "complement":"complement 2",
       "description":"Ceci est une test description",
       "title":"ceci est un autre titre test",
-      "ville":"Test",
+      "ville":"Neuilly-Plaisance",
       "numero_rue":"29 bis",
       "categorie":"patates zakia",
-      "departement":"Sadam hautes saines a zakia",
       "rue":"boulevard gallieni",
       "code_postal":"93360",
       "allergenes":true,
       "status":0,
-      "poids":"18kg",
-      "contenu": [
-          {item: "item1", quantite: 10, codeEAN: "code1"},
-          {item: "item2", quantite: 5, codeEAN: "code2"}
-      ]
+      "contenu": selectedFoodsList,
+      "liste_creneaux": selectedSlotsList,
     };
 
-    const apiURL = 'https://3ac0-163-5-23-68.ngrok-free.app/api/announcement/createAnnouncement';
+
+    const apiURL = 'https://b287-163-5-23-68.ngrok-free.app/api/announcement/createAnnouncement';
     try{
       const header = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MDEzNzA1MTMsImV4cCI6MTcwMTM3NDExMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidXNlckBnbWFpbC5jb20ifQ.UrbjopmFAqIANOnD9L1pX2KDUFWOzmh_3-IZP7YRprNf67TMnR_LRIZVsU3Ak5ihR81ZOtmqMzzmMGpGk13xA5ZKVTRJ1deMYNIIAXuXXIJE3GeOAd5QpuUhnkrteEatSL0Sf9eHePMVTHpGaXI6oSJg6SlOmCu3MM_AEAeYfGoY0DnyubkG-8AfVde53_zVHGZrtI5SK-urgMFtV8cQ1PgiSmPGJbcMCTv2pecN4AiWVef1Mz3MFkozFh5LPlQ2q0fKvTt5dacsrSjDgGVvpNZPNZw1jJDUMnspi0cqRwBTbFULsZm8LrKd6pyXbftZyYAywDUrnOSLS3E0NR3DKA'
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MDIwNDU3NzUsImV4cCI6MTcwMjA0OTM3NSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidXNlckBnbWFpbC5jb20ifQ.U2JBxBXawnksz9sDTGQiBY6Q3HkHmNO1I38ZyX-avzaP2XbGDj6cvk4MVtVX2BhoJ0eTXyjJC_2xOttnQrnx95O5TvRBiInP3svqKdCouRW4l7-R-Ff-_xtENIMVxytrJ-7WVqO9CJV_Y8_-x8QbMPXpUvYHAsACJnNsriMas2fc0jKtsjFgI8OClEq_m5cq2kJnLWtWyTohuuGJbQeYI9vWO7DR8cVWNg5ADGNfNP_DGOohZl4vn92IoC65u-JVTj3gRRUBZNrCFetz8ze0T1pnYYXF8bzwrgv1AZfPGmVPLpEd1BP5zG7P8UX1l4SS3slMDia31dapXWL-6KgnSA'
         }
       }
       const response = await axios.post(apiURL, params, header);
@@ -134,11 +132,14 @@ export default function CreatePanierPage() {
     { label: "Pain de mie", value: "Pain de mie", ean: "3270190021438" },
     { label: "Salade verte", value: "Salade verte", ean: "3280223110077" },
     { label: "Céréales petit-déjeuner", value: "Céréales petit-déjeuner", ean: "7613034947611" },
-    { label: "Poisson en conserve", value: "Poisson en conserve", ean: "3560070808731" }  ];
+    { label: "Poisson en conserve", value: "Poisson en conserve", ean: "3560070808731" },
+    { label: "Purée de tomates", value: "Purée de tomates", ean: "3560070323289" },
+    { label: "Compote de pommes", value: "Compote de pommes", ean: "3270190181262" },
+  ];
 
-  const handleAddToPanier = (food: string, quantity: number, ean: string) => {
-    if (food !== "" && !selectedFoodsList.some((item) => item.food === food)) {
-      setSelectedFoodsList([{ food, quantity, ean }, ...selectedFoodsList]);
+  const handleAddToPanier = (item: string, quantite: number, codeEAN: string) => {
+    if (item && quantite && !selectedFoodsList.some((items) => items.item === item)) {
+      setSelectedFoodsList([{ item, quantite, codeEAN }, ...selectedFoodsList]);
     }
   };
 
@@ -175,16 +176,17 @@ export default function CreatePanierPage() {
       }
 
       const slotInfo = {
-        day: formattedDate.toLocaleDateString('fr-FR'),
+        day: formattedDate.toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-'),
         slot: {
-          dateDebut: slotStart.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric' }),
-          dateEnd: slotEnd.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric' }),
+          dateDebut: slotStart.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric', second: 'numeric' }),
+          dateEnd: slotEnd.toLocaleString('fr-FR', { hour: 'numeric', minute: 'numeric', second: 'numeric' }),
         },
       };
-
+      
+      console.log("slotInfo + " + slotInfo.day + " " + slotInfo.slot.dateDebut + " " + slotInfo.slot.dateEnd);
       setSelectedSlotsList([slotInfo, ...selectedSlotsList]);
-      setSelectedDate(null);
-      setSelectedTimeSlot(null);
+      setSelectedDate(null); // Réinitialise la date de livraison à null
+      setSelectedTimeSlot(null); // Réinitialise le créneau de livraison à null
       setPlaceholderText("Choisissez une date");
     }
   };
@@ -241,12 +243,13 @@ export default function CreatePanierPage() {
                 {selectedFoodsList.map((item, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => showFoodModal({ food: item.food, quantity: item.quantity, ean: foodOptions.find((option) => option.value === item.food)?.ean as string })}
+              onPress={() => showFoodModal({ food: item.item, quantity: item.quantite, ean: foodOptions
+                .find((option) => option.value === item.item)?.ean as string })}
               style={styles.touchableFoodItem}
             >
               <View style={styles.selectedFoodItem}>
                 <Text style={styles.selectedFoodText}>
-                  {item.food} - Quantité: {item.quantity}
+                  {item.item} - Quantité: {item.quantite}
                 </Text>
               </View>
             </TouchableOpacity>

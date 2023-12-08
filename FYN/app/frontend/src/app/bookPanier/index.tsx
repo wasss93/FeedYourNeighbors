@@ -1,5 +1,6 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Switch } from "react-native";
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Switch, ActivityIndicator } from "react-native";
 
 interface SelectedFoodItem {
   food: string;
@@ -8,9 +9,9 @@ interface SelectedFoodItem {
 }
 
 type FoodInfo = {
-  food: string;
-  quantity: number;
-  ean: string;
+  item: string;
+  quantite: number; 
+  codeEAN: string;
 };
 
 const BookPanierPage = () => {
@@ -21,39 +22,92 @@ const BookPanierPage = () => {
   const [selectedSlotModalVisible, setSelectedSlotModalVisible] = useState(false);
   const [foodModalVisible, setFoodModalVisible] = useState(false); // Nouvel état pour la modal de la nourriture
   const [nutritionInfo, setNutritionInfo] = useState<any>(null); // Utilisez un type plus précis pour les informations nutritionnelles
+  const [jsonContent, setJsonContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
-
-  const jsonContent = {
-    selectedFoodsList: [
-      { food: "Céréales petit-déjeuner", quantity: 3, ean: "3270190021438" },
-      { food: "Lactel 1L", quantity: 3, ean: "3270190021438" },
-      { food: "Paquet de riz Basmati", quantity: 3, ean: "3270190021438" },
-      { food: "Pommes (1kg)", quantity: 3, ean: "3270190021438" },
-      { food: "Pâtes (500g)", quantity: 3, ean: "3270190021438"},
-      { food: "Purée de tomates (500g)", quantity: 3, ean: "3270190021438"},
-      { food: "Pois chiches (500g)", quantity: 3, ean: "3270190021438"},
-      { food: "Haricots rouges (500g)", quantity: 3, ean: "3270190021438"},
-      { food: "Lentilles (500g)", quantity: 3, ean: "3270190021438"},
-    ],
-    selectedSlotsList: [
-      {
-        day: "07/12/2023",
-        slot: { dateDebut: "14:00", dateEnd: "16:00" }
-      },
-      {
-        day: "03/12/2023",
-        slot: { dateDebut: "16:00", dateEnd: "18:00" }
-      },
-      {
-        day: "02/12/2023",
-        slot: { dateDebut: "16:00", dateEnd: "18:00" }
-      },
-      {
-        day: "03/12/2023",
-        slot: { dateDebut: "10:00", dateEnd: "11:00" }
-      },
-    ]
+  const formatDateToWords = (dateString: string | number | Date) => {
+    const daysOfWeek = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const months = [
+      'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ];
+  
+    const date = new Date(dateString);
+    const dayOfWeek = daysOfWeek[date.getDay()];
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+  
+    return `${dayOfWeek} ${day} ${month} ${year}`;
   };
+  
+
+  const reservationPanier = async () => {
+    console.log('Selected Day:', selectedDay);
+    const [startTime, endTime] = (selectedTimeSlot || "").split(' à ');
+
+    const formatTime = (time: string) => {
+      const [hours, minutes] = time.split(':');
+      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    };
+
+    const dateBegin = `${selectedDay} ${formatTime(startTime)}:00`;
+    const dateEnd = `${selectedDay} ${formatTime(endTime)}:00`;
+    console.log({ dateBegin, dateEnd });
+    console.log("id", jsonContent.id);
+    const params = {
+      "announcement_id": jsonContent.id,
+      "start": dateBegin,
+      "end": dateEnd,
+      "status": 0,
+      "comment": " ",
+    };
+    const header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MDIwNDU5MzcsImV4cCI6MTcwMjA0OTUzNywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidXNlcjVAZ21haWwuY29tIn0.HjAKJXC2oiRs7YRlJlUslt7yzDF5sW8Eahvw1jQglpYKjQNKQZDwZzcx4336VtvLGHq453KpZsHby8RW_2rRrkGi3GljvRFJxKS2mLKMk4iQCK9SCC-Qnl6Sshd9O_UvHnH1LdD_6g-ZUKhXHnnumRoLZkOGUlK9bL5PKd1N8SwTBYZRUzVnS8UfFmuqZ520aaW-1Jvr2AwNnFwk8aqBuEXRHtz5O-F4i2E97bm4oG04bAI47ITkYCudt3yCHC8roujGSX48zvdIrt07a5fyBttbtXyfqYNnAHjd9hKtF6ma81d5hwnVfqKJbktXMh5REa7n-ZiSulooZoCasDy3sw'
+        }
+      }
+    const apiURL = 'https://b287-163-5-23-68.ngrok-free.app/api/reservations/createReservation';
+    try {
+      const response = await axios.post(apiURL, params, header);
+      const data = await response.data;
+      console.log('Response data:', data);
+      return data;
+    } catch (error) {
+      console.error('Error making the request:', error);
+    }
+  }
+
+
+
+
+  const getBookedPanier = async () => {
+    const params = {
+      id_announcement: 64,
+    };
+    const header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3MDIwNDU5MzcsImV4cCI6MTcwMjA0OTUzNywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidXNlcjVAZ21haWwuY29tIn0.HjAKJXC2oiRs7YRlJlUslt7yzDF5sW8Eahvw1jQglpYKjQNKQZDwZzcx4336VtvLGHq453KpZsHby8RW_2rRrkGi3GljvRFJxKS2mLKMk4iQCK9SCC-Qnl6Sshd9O_UvHnH1LdD_6g-ZUKhXHnnumRoLZkOGUlK9bL5PKd1N8SwTBYZRUzVnS8UfFmuqZ520aaW-1Jvr2AwNnFwk8aqBuEXRHtz5O-F4i2E97bm4oG04bAI47ITkYCudt3yCHC8roujGSX48zvdIrt07a5fyBttbtXyfqYNnAHjd9hKtF6ma81d5hwnVfqKJbktXMh5REa7n-ZiSulooZoCasDy3sw'
+      }
+    }
+    const apiURL = 'https://b287-163-5-23-68.ngrok-free.app/api/announcement/getAnnouncementById';
+    try {
+      const response = await axios.post(apiURL, params, header);
+      const data = await response.data;
+      console.log('Response data:', data);
+      setJsonContent(data);
+      setLoading(false);
+      return data;
+    } catch (error) {
+      console.error('Error making the request:', error);
+    }
+  };
+
+  const selectedFoodsList = jsonContent?.contenu || [];
+  const selectedSlotsList = jsonContent?.creneaux || [];
 
   const [sortedDays, setSortedDays] = useState<string[]>([]);
 
@@ -66,8 +120,15 @@ const BookPanierPage = () => {
   }, [sortedDays]);
 
   useEffect(() => {
-    const days = [...new Set(jsonContent.selectedSlotsList.map(item => item.day))].sort();
-    setSortedDays(days);
+    if (jsonContent && selectedSlotsList) {
+      const days = [...new Set(selectedSlotsList.map((item: { day: any }) => item.day))].sort() as string[];
+      setSortedDays(days);
+    }
+  }, [jsonContent]);
+
+  useEffect(() => {
+    getBookedPanier();
+    console.log(1111, jsonContent);
   }, []);
 
   const generateSubSlots = (start: string, end: string) => {
@@ -86,38 +147,39 @@ const BookPanierPage = () => {
     return subSlots;
   };
 
-  const handleSlotReservation = () => {
-    if (selectedDay && selectedTimeSlot) {
-      const [startTime, endTime] = selectedTimeSlot.split(' à ');
+  // const handleSlotReservation = () => {
+  //   if (selectedDay && selectedTimeSlot) {
+  //     const [startTime, endTime] = selectedTimeSlot.split(' à ');
 
-      const formatTime = (time: string) => {
-        const [hours, minutes] = time.split(':');
-        return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      };
+  //     const formatTime = (time: string) => {
+  //       const [hours, minutes] = time.split(':');
+  //       return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+  //     };
 
-      const formatDate = (day: string) => {
-        const [dayStr, monthStr, yearStr] = day.split('/');
-        return `${yearStr}-${monthStr.padStart(2, '0')}-${dayStr.padStart(2, '0')}`;
-      };
+  //     const formatDate = (day: string) => {
+  //       const [dayStr, monthStr, yearStr] = day.split('/');
+  //       return `${yearStr}-${monthStr.padStart(2, '0')}-${dayStr.padStart(2, '0')}`;
+  //     };
 
-      const dateBegin = `${formatDate(selectedDay)}T${formatTime(startTime)}:00`;
-      const dateEnd = `${formatDate(selectedDay)}T${formatTime(endTime)}:00`;
+  //     const dateBegin = `${formatDate(selectedDay)}T${formatTime(startTime)}:00`;
+  //     const dateEnd = `${formatDate(selectedDay)}T${formatTime(endTime)}:00`;
 
-      console.log({ dateBegin, dateEnd });
+  //     console.log({ dateBegin, dateEnd });
+  //     // const dataPanier = getBookedPanier();
+  //     // console.log(2222, dataPanier);
+  //     // Vous pouvez également enregistrer ces données dans un fichier JSON ici
 
-      // Vous pouvez également enregistrer ces données dans un fichier JSON ici
+  //     setSelectedSlotModalVisible(false);
+  //   }
+  // };
 
-      setSelectedSlotModalVisible(false);
-    }
-  };
-
-  const showFoodModal = async (foodInfo: { food: string; quantity: number; ean: string; }) => {
+  const showFoodModal = async (foodInfo: { item: string; quantite: number; codeEAN: string;}) => {
     setSelectedFoodInfo(foodInfo);
     var api_key = "0ad5af6f3a7a484a95519fa67a64c39f";
     try {
-      const response = await fetch(`https://api.spoonacular.com/food/products/upc/${foodInfo.ean}?apiKey=${api_key}&includeNutrition=true`);
+      const response = await fetch(`https://api.spoonacular.com/food/products/upc/${foodInfo.codeEAN}?apiKey=${api_key}&includeNutrition=true`);
       const data = await response.json();
-      console.log(data);
+      console.log("ddddd", data);
       setNutritionInfo(data);
     } catch (error) {
       console.error("Erreur lors de la récupération des informations nutritionnelles :", error);
@@ -134,30 +196,38 @@ const BookPanierPage = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      {loading ? (
+         <View style={styles.loadingContainer}>
+         <ActivityIndicator size="large" color="#15A370" />
+          </View>
+      ) : (
+        <View style={styles.container}>
+          
+          
       <View style={styles.container}>
         <Text style={styles.title}>FYN</Text>
         <Text style={styles.subtitle}>Feed your neighbour</Text>
         <Text style={styles.subtitle}>Réserver un panier</Text>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.label}>Aliments présents dans le panier :</Text>
-          {jsonContent.selectedFoodsList.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => showFoodModal(item)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.clickableItem}>
-                <Text>{item.food} - Quantité: {item.quantity}</Text>
-              </View>
-            </TouchableOpacity>
+        <Text style={styles.label}>Aliments présents dans le panier :</Text>
+              {selectedFoodsList.map((item: { item: string; quantite: number; codeEAN: string; size: string }, index: React.Key | null | undefined) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => showFoodModal(item)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.productContainer}>
+                    <Text>{item.item} - Quantité: {item.quantite}</Text>
+                  </View>
+                </TouchableOpacity>
           ))}
 
-          <Text style={styles.label}>Créneaux sélectionnés :</Text>
+          <Text style={styles.label}>Choisissez la date qui vous couvient puis réservez un créneau !</Text>
           {sortedDays.map((day, index) => (
             <View key={index}>
               <View style={styles.dayContainer}>
-                <Text style={styles.dayLabel}>{day}</Text>
+              <Text style={styles.dayLabel}>{formatDateToWords(day)}</Text>
                 <Switch
                   value={dateVisibility[day as keyof typeof dateVisibility] || false}
                   onValueChange={(value) => setDateVisibility({ ...dateVisibility, [day]: value })}
@@ -165,9 +235,9 @@ const BookPanierPage = () => {
                   thumbColor={dateVisibility[day as keyof typeof dateVisibility] ? "#f5dd4b" : "#f4f3f4"}
                 />
               </View>
-              {jsonContent.selectedSlotsList
-                .filter(item => item.day === day)
-                .map((item, innerIndex) => (
+              {selectedSlotsList
+                .filter((item: { day: string; }) => item.day === day)
+                .map((item: { slot: { dateDebut: string; dateEnd: string; }; }, innerIndex: React.Key | null | undefined) => (
                   <View key={innerIndex}>
                     {dateVisibility[day as keyof typeof dateVisibility] ? (
                       // Affichez tous les sous-créneaux lorsque la date est visible
@@ -210,7 +280,7 @@ const BookPanierPage = () => {
               Selected Time Slot: {selectedTimeSlot}
             </Text>
             
-            <TouchableOpacity onPress={handleSlotReservation} style={styles.modalReserveButton}>
+            <TouchableOpacity onPress={reservationPanier} style={styles.modalReserveButton}>
               <Text style={styles.modalReserveButtonText}>Submit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setSelectedSlotModalVisible(false)}>
@@ -227,13 +297,13 @@ const BookPanierPage = () => {
       >
         <View style={styles.modalContainer}>
           <Text style={styles.modalText}>
-            Selected Food: {nutritionInfo?.title}
+            Selected Food: {nutritionInfo?.item?.name || selectedFoodInfo?.item}
           </Text>
           <Text style={styles.modalText}>
-            Quantity: {selectedFoodInfo?.quantity}
+            Quantity: {selectedFoodInfo?.quantite}
           </Text>
           <Text style={styles.modalText}>
-            EAN: {selectedFoodInfo?.ean}
+            EAN: {selectedFoodInfo?.codeEAN}
           </Text>
           {nutritionInfo && nutritionInfo.nutrition && nutritionInfo.nutrition.nutrients && (
             <>
@@ -255,6 +325,8 @@ const BookPanierPage = () => {
         </View>
       </Modal>
       </View>
+      </View>
+        )}
     </ScrollView>
   );
 };
@@ -284,6 +356,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
     marginBottom: 10,
+    textAlign: "center",
   },
   modalContainer: {
     flex: 1,
@@ -358,6 +431,19 @@ const styles = StyleSheet.create({
     color: 'white', // Couleur du texte
     fontSize: 18, // Taille du texte
     textAlign: 'center', // Alignement du texte au centre
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  productContainer: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    height: 50, 
+    width: 300, // Ajustez la largeur en fonction de vos besoins
   },
 });
 
