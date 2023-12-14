@@ -84,7 +84,7 @@ const BookPanierPage = () => {
 
   const getBookedPanier = async () => {
     const params = {
-      id_announcement: 64,
+      id_announcement: 65,
     };
     const header = {
       headers: {
